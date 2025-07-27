@@ -6,7 +6,9 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
 </script>
 <template>
   <section class="theme-toggle">
-    <div id="theme-toggle-label" class="visually-hidden-screen-reader">Theme selection</div>
+    <div id="theme-toggle-label" class="visually-hidden-screen-reader">
+      Theme selection
+    </div>
     <nord-button-group
       direction="horizontal"
       gap="xs"
@@ -25,7 +27,7 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
         role="button"
         data-allow-mismatch
       >
-        <nord-icon name="interface-mode-light" />
+        <nord-icon size="m" slot="start" class="icon-only" name="interface-mode-light" />
       </nord-button>
       <nord-button
         size="s"
@@ -36,7 +38,7 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
         role="button"
         data-allow-mismatch
       >
-        <nord-icon name="interface-mode-dark" />
+        <nord-icon size="m" slot="start" class="icon-only" name="interface-mode-dark" />
       </nord-button>
       <nord-button
         size="s"
@@ -50,8 +52,9 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
         data-allow-mismatch
       >
         <nord-icon
+          size="m"
+          slot="start" class="icon-only hack-contrast-icon"
           name="interface-partially-complete-small"
-          class="hack-contrast-icon"
         />
       </nord-button>
     </nord-button-group>
