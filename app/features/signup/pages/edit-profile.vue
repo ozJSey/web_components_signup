@@ -1,14 +1,13 @@
-
 <script setup lang="ts">
 import { toTypedSchema } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { z } from "zod";
 import { useAuthStore } from "~/entities/auth/stores/auth.store";
 import { useAuth } from "~/shared/composables/useAuth";
 
 const { updateUser } = useAuth();
-const { currentUser } = toRefs(useAuthStore());
+const { currentUser, isAuthLoading } = toRefs(useAuthStore());
 
 const formSchema = z.object({
   firstName: z.string().optional(),
@@ -17,16 +16,18 @@ const formSchema = z.object({
   company: z.string().optional(),
   phone: z.string().optional(),
 });
+const initialValues = ref({
+  firstName: currentUser.value?.firstName,
+  lastName: currentUser.value?.lastName,
+  department: currentUser.value?.department,
+  company: currentUser.value?.company,
+  phone: currentUser.value?.phone,
+});
 
-const { handleSubmit: handleFormSubmit } = useForm({
+
+const { handleSubmit: handleFormSubmit, meta, setValues } = useForm({
   validationSchema: toTypedSchema(formSchema),
-  initialValues: {
-    firstName: currentUser.value?.firstName,
-    lastName: currentUser.value?.lastName,
-    department: currentUser.value?.department,
-    company: currentUser.value?.company,
-    phone: currentUser.value?.phone,
-  },
+  initialValues: initialValues.value,
 });
 
 const {
@@ -90,23 +91,7 @@ const replaceFalsyValues = (event: KeyboardEvent) => {
   }
 };
 
-const initialValues = ref({
-  firstName: currentUser.value?.firstName,
-  lastName: currentUser.value?.lastName,
-  department: currentUser.value?.department,
-  company: currentUser.value?.company,
-  phone: currentUser.value?.phone,
-});
-
-const hasChanges = computed(() => {
-  return (
-    firstName.value !== initialValues.value.firstName ||
-    lastName.value !== initialValues.value.lastName ||
-    department.value !== initialValues.value.department ||
-    company.value !== initialValues.value.company ||
-    phone.value !== initialValues.value.phone
-  );
-});
+const hasChanges = computed(() => meta.value.dirty);
 
 const handleConfirm = handleFormSubmit(async (values) => {
   try {
@@ -139,6 +124,17 @@ const handleEscape = () => {
     setPhone("");
   }
 };
+
+watchImmediate(() => currentUser.value?.email, () => {
+  initialValues.value = {
+    firstName: currentUser.value?.firstName,
+    lastName: currentUser.value?.lastName,
+    department: currentUser.value?.department,
+    company: currentUser.value?.company,
+    phone: currentUser.value?.phone,
+  };
+  setValues(initialValues.value);
+});
 </script>
 <template>
   <section role="main" aria-labelledby="profile-heading">
@@ -192,28 +188,44 @@ const handleEscape = () => {
                 direction="horizontal"
                 class="n-border-radius"
               >
-                <nord-input
-                  autocomplete="given-name"
-                  expand
-                  @input="
-                    setFirstName(($event.target as HTMLInputElement)?.value)
-                  "
-                  :value="firstName"
-                  label="First name"
-                  :error="currentFirstNameError"
-                  aria-describedby="first-name-error first-name-help"
-                />
-                <nord-input
-                  autocomplete="family-name"
-                  expand
-                  @input="
-                    setLastName(($event.target as HTMLInputElement)?.value)
-                  "
-                  :value="lastName"
-                  label="Last name"
-                  :error="currentLastNameError"
-                  aria-describedby="last-name-error last-name-help"
-                />
+                <template v-if="isAuthLoading">
+                  <nord-skeleton
+                    :style="{
+                      height: '45px',
+                      width: '100%'
+                    }"
+                  />
+                  <nord-skeleton
+                    :style="{
+                      height: '45px',
+                      width: '100%'
+                    }"
+                  />
+                </template>
+                <template v-else>
+                  <nord-input
+                    autocomplete="given-name"
+                    expand
+                    @input="
+                      setFirstName(($event.target as HTMLInputElement)?.value)
+                    "
+                    :value="firstName"
+                    label="First name"
+                    :error="currentFirstNameError"
+                    aria-describedby="first-name-error first-name-help"
+                  />
+                  <nord-input
+                    autocomplete="family-name"
+                    expand
+                    @input="
+                      setLastName(($event.target as HTMLInputElement)?.value)
+                    "
+                    :value="lastName"
+                    label="Last name"
+                    :error="currentLastNameError"
+                    aria-describedby="last-name-error last-name-help"
+                  />
+                </template>
               </nord-stack>
               <div
                 id="first-name-error"
@@ -238,49 +250,82 @@ const handleEscape = () => {
                 Enter your last name (optional).
               </div>
 
-              <nord-input
-                expand
-                @input="
-                  setDepartment(($event.target as HTMLInputElement)?.value)
-                "
-                :value="department"
-                label="Department"
-                :error="currentDepartmentError"
-                aria-describedby="department-error department-help"
-              />
-              <div
-                id="department-error"
-                class="visually-hidden-screen-reader"
-                tabindex="-1"
-                aria-live="polite"
-              >
-                {{ currentDepartmentError }}
-              </div>
-              <div id="department-help" class="visually-hidden-screen-reader" tabindex="-1">
-                Enter your department or team name (optional).
-              </div>
+              <template v-if="isAuthLoading">
+                <nord-skeleton
+                  :style="{
+                    height: '45px',
+                    width: '100%'
+                  }"
+                />
+                <nord-skeleton
+                  :style="{
+                    height: '45px',
+                    width: '100%'
+                  }"
+                />
+              </template>
+              <template v-else>
+                <nord-input
+                  expand
+                  @input="
+                    setDepartment(($event.target as HTMLInputElement)?.value)
+                  "
+                  :value="department"
+                  label="Department"
+                  :error="currentDepartmentError"
+                  aria-describedby="department-error department-help"
+                />
+                <div
+                  id="department-error"
+                  class="visually-hidden-screen-reader"
+                  tabindex="-1"
+                  aria-live="polite"
+                >
+                  {{ currentDepartmentError }}
+                </div>
+                <div id="department-help" class="visually-hidden-screen-reader" tabindex="-1">
+                  Enter your department or team name (optional).
+                </div>
+              </template>
 
-              <nord-input
-                expand
-                @input="setCompany(($event.target as HTMLInputElement)?.value)"
-                :value="company"
-                label="Company"
-                :error="currentCompanyError"
-                aria-describedby="company-error company-help"
+              <template v-if="isAuthLoading">
+                <nord-skeleton
+                  :style="{
+                    height: '45px',
+                    width: '100%'
+                  }"
+                />
+              </template>
+              <template v-else>
+                <nord-input
+                  expand
+                  @input="setCompany(($event.target as HTMLInputElement)?.value)"
+                  :value="company"
+                  label="Company"
+                  :error="currentCompanyError"
+                  aria-describedby="company-error company-help"
+                />
+                <div
+                  id="company-error"
+                  class="visually-hidden-screen-reader"
+                  tabindex="-1"
+                  aria-live="polite"
+                >
+                  {{ currentCompanyError }}
+                </div>
+                <div id="company-help" class="visually-hidden-screen-reader" tabindex="-1">
+                  Enter your company or organization name (optional).
+                </div>
+              </template>
+              <nord-skeleton
+                v-if="isAuthLoading"
+                :style="{
+                  height: '45px',
+                  width: '100%'
+                }"
               />
-              <div
-                id="company-error"
-                class="visually-hidden-screen-reader"
-                tabindex="-1"
-                aria-live="polite"
-              >
-                {{ currentCompanyError }}
-              </div>
-              <div id="company-help" class="visually-hidden-screen-reader" tabindex="-1">
-                Enter your company or organization name (optional).
-              </div>
-
               <nord-input
+                v-else
                 type="text"
                 autocomplete="tel"
                 expand
@@ -325,7 +370,7 @@ const handleEscape = () => {
                   @click="handleConfirm"
                   variant="primary"
                   expand
-                  :disabled="!hasChanges"
+                  :disabled="!hasChanges || isAuthLoading"
                   type="submit"
                   aria-describedby="confirm-status"
                   @keydown.enter="handleConfirm"
