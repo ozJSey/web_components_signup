@@ -1,14 +1,22 @@
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import importPlugin from 'eslint-plugin-import';
+import vuePlugin from 'eslint-plugin-vue';
+import vueParser from 'vue-eslint-parser';
 
 export default [
-  // Base configuration for TypeScript and JavaScript files
+  // Global ignores
   {
-    files: ['app/**/*.{js,ts}'],
     ignores: [
       '.nuxt/**/*',
       '.output/**/*', 
       'node_modules/**/*',
       'dist/**/*',
     ],
+  },
+  // Base configuration for TypeScript and JavaScript files
+  {
+    files: ['app/**/*.{js,ts}'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -51,7 +59,7 @@ export default [
       // Import Rules - Strict absolute imports only
       'import/no-relative-parent-imports': 'off',
       'import/no-relative-packages': 'error',
-      'import/order': ['error', {
+      'import/order': ['warn', {
         'groups': [
           'builtin',
           'external',
@@ -95,7 +103,7 @@ export default [
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
-      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-floating-promises': 'off', // You need to know when to await a promise always awaiting is a blocker.
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/require-await': 'error',
@@ -118,7 +126,7 @@ export default [
       'no-multiple-empty-lines': ['error', { max: 1 }],
       'no-trailing-spaces': 'error',
       'comma-dangle': ['error', 'always-multiline'],
-      'quotes': ['error', 'single', { avoidEscape: true }],
+      'quotes': ['error', 'double', { avoidEscape: true }],
       'semi': ['error', 'always'],
       
       // Security and Safety
@@ -162,7 +170,6 @@ export default [
       ...vuePlugin.configs['flat/recommended'].rules,
       
       // Component Structure & Naming
-      'vue/component-name-in-template-casing': ['error', 'kebab-case'],
       'vue/prop-name-casing': ['error', 'camelCase'],
       'vue/component-definition-name-casing': ['error', 'PascalCase'],
       'vue/multi-word-component-names': 'off', // Allow single word for Nord components
@@ -239,7 +246,7 @@ export default [
       'vue/no-deprecated-inline-template': 'error',
       'vue/no-deprecated-props-default-this': 'error',
       'vue/no-deprecated-scope-attribute': 'error',
-      'vue/no-deprecated-slot-attribute': 'error',
+      'vue/no-deprecated-slot-attribute': 'off', // Need for Web components
       'vue/no-deprecated-slot-scope-attribute': 'error',
       'vue/no-deprecated-v-bind-sync': 'error',
       'vue/no-deprecated-v-is': 'error',
@@ -295,7 +302,7 @@ export default [
       'no-console': ['warn', { allow: ['error'] }],
       'eqeqeq': ['error', 'always'],
       'curly': ['error', 'all'],
-      'quotes': ['error', 'single', { avoidEscape: true }],
+      'quotes': ['error', 'double', { avoidEscape: true }],
       'semi': ['error', 'always'],
     },
     settings: {

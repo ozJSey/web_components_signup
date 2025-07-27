@@ -202,7 +202,7 @@ app/
 ### Authentication
 
 - **Public routes**: `/`, `/sign-up`, `/sign-in`
-- **Protected routes**: `/profile`, `/success`
+- **Protected routes**: `/edit-profile`, `/success`
 - Automatic redirection based on authentication status
 
 ## 🚀 Deployment
