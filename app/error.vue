@@ -21,7 +21,7 @@ const errorMessage = computed(() => {
   if (is404.value) {
     return "The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.";
   }
-  return props.error.message || "An unexpected error occurred.";
+  return props.error.message ?? "An unexpected error occurred.";
 });
 
 // Navigation handler
@@ -47,20 +47,36 @@ const goBack = () => {
         size="xl"
       />
       <nord-stack direction="vertical" gap="xl" align-items="center">
-        <nord-badge strong variant="danger"
-          >Error {{ error.statusCode }}</nord-badge
-        >
+        <nord-badge
+          strong
+          variant="danger"
+        >Error {{ error.statusCode }}</nord-badge>
         <h1>{{ errorTitle }}</h1>
         <nord-banner>{{ errorMessage }}</nord-banner>
       </nord-stack>
 
-      <nord-stack justify-content="center" gap="l" direction="horizontal" class="n-padding-xl">
+      <nord-stack
+        justify-content="center"
+        gap="l"
+        direction="horizontal"
+        class="n-padding-xl"
+      >
         <nord-button variant="plain" @click="goBack">
-          <nord-icon slot="start" name="arrow-left" size="s" class="n-margin-ie-s"/>
+          <nord-icon
+            slot="start"
+            name="arrow-left"
+            size="s"
+            class="n-margin-ie-s"
+          />
           Go Back
         </nord-button>
         <nord-button variant="primary" @click="goHome">
-          <nord-icon slot="start" name="interface-home" size="s" class="n-margin-ie-s" />
+          <nord-icon
+            slot="start"
+            name="interface-home"
+            size="s"
+            class="n-margin-ie-s"
+          />
           Go to home
         </nord-button>
       </nord-stack>
