@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { toTypedSchema } from "@vee-validate/zod";
+import { watchImmediate } from "@vueuse/core";
 import { useField, useForm } from "vee-validate";
 import { z } from "zod";
 import { useAuthStore } from "~/entities/auth/stores/auth.store";
@@ -7,8 +8,8 @@ import { useAuth } from "~/shared/composables/useAuth";
 import { MAXIMUM_EMAIL_LENGTH } from "~/shared/constants/input_max_length";
 
 const isPasswordType = ref(true);
-
 const { authenticate } = useAuth();
+const { query } = toRefs(useRoute());
 const { isAuthLoading } = toRefs(useAuthStore());
 
 const formSchema = z.object({
@@ -44,8 +45,20 @@ const handleEscape = () => {
   setPassword("");
 };
 
+
+
 const handleSubmit = handleFormSubmit((values) => {
   authenticate(values.email, values.password, () => navigateTo("/success"));
+});
+
+watchImmediate(query, (value) => {
+  if (typeof value.email === "string") {
+    setEmail(value.email);
+    setPassword("");
+    nextTick(() => {
+      navigateTo("/sign-in", { replace: true });
+    });
+  }
 });
 </script>
 <template>
@@ -150,6 +163,8 @@ const handleSubmit = handleFormSubmit((values) => {
                         ? 'interface-edit-on'
                         : 'interface-edit-off'
                     "
+                    slot="start"
+                    class="icon-only"
                     aria-hidden="true"
                   ></nord-icon>
                 </nord-button>
@@ -173,6 +188,7 @@ const handleSubmit = handleFormSubmit((values) => {
 
               <nord-button
                 :disabled="!isFormValid || isAuthLoading"
+                :loading="isAuthLoading"
                 @click="handleSubmit"
                 variant="primary"
                 expand
@@ -181,7 +197,7 @@ const handleSubmit = handleFormSubmit((values) => {
                 @keydown.enter="handleSubmit"
                 @keydown.space.prevent="handleSubmit"
               >
-                {{ isAuthLoading ? "Signing in..." : "Sign in" }}
+                Sign in
               </nord-button>
               <div
                 id="submit-status"
@@ -201,15 +217,15 @@ const handleSubmit = handleFormSubmit((values) => {
                 align-items="center"
                 justify-content="end"
                 direction="horizontal"
-                class="n-typescale-xs n-padding-m"
+                class="n-padding-m"
               >
-                <p class="n-color-text-weak n-margin-be-xs">Not a member?</p>
+                <p class="n-color-text-weak n-typescale-s n-margin-be-xs">Don't have an account?</p>
                 <NuxtLink
                   to="/sign-up"
-                  class="n-color-text-accent"
+                  class="n-color-text-accent n-typescale-s"
                   aria-label="Navigate to signup page"
                 >
-                  Sign up instead
+                  Sign up here
                 </NuxtLink>
               </nord-stack>
             </nord-stack>
