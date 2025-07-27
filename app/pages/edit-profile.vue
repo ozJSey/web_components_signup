@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ProfilePage from '~/features/signup/pages/profile.vue';
+import ProfilePage from "~/features/signup/pages/edit-profile.vue";
 definePageMeta({
   pageTransition: {
     name: "rotate",
     mode: "out-in",
   },
-  layout: 'default',
+  layout: "default",
 });
 </script>
 <template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useAuthStore } from '~/entities/auth/stores/auth.store';
+import { useAuthStore } from "~/entities/auth/stores/auth.store";
 
 definePageMeta({
   pageTransition: {
     name: "rotate",
     mode: "out-in",
   },
-  layout: 'default',
+  layout: "default",
   middleware: () => {
     const { isAuthenticated } = toRefs(useAuthStore());
     

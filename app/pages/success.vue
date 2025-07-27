@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import SuccessPage from '~/features/signup/pages/success.vue';
+import SuccessPage from "~/features/signup/pages/success.vue";
 definePageMeta({
   pageTransition: {
     name: "rotate",
     mode: "out-in",
   },
-  layout: 'default',
+  layout: "default",
 });
 </script>
 <template>
