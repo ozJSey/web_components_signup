@@ -1,10 +1,11 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-
-    <ThemeToggle class="theme-toggle" />
-    <nord-toast-group ref="toastGroupRef" />
-  </NuxtLayout>
+  <ErrorBoundary>
+    <NuxtLayout>
+      <NuxtPage />
+      <ThemeToggle class="theme-toggle" />
+      <nord-toast-group ref="toastGroupRef" />
+    </NuxtLayout>
+  </ErrorBoundary>
 </template>
 
 <script setup lang="ts">
@@ -42,7 +43,7 @@ const handleSkipLink = (event: Event) => {
   if (target.classList.contains("skip-link")) {
     event.preventDefault();
     const targetId = target.getAttribute("href")?.substring(1);
-    const targetElement = document.getElementById(targetId || "");
+    const targetElement = document.getElementById(targetId ?? "");
     if (targetElement) {
       targetElement.focus();
       targetElement.scrollIntoView({ behavior: "smooth" });
@@ -68,7 +69,7 @@ const handleGlobalKeyboard = (event: KeyboardEvent) => {
   if (event.key === "Escape") {
     // Could be extended to close modals, dropdowns, etc.
     const activeElement = document.activeElement as HTMLElement;
-    if (activeElement && activeElement.blur) {
+    if (activeElement?.blur) {
       activeElement.blur();
     }
   }
