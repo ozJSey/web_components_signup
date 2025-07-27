@@ -114,8 +114,8 @@ const formattedDate = computed(() => {
             <nord-stack
               v-if="
                 currentUser?.firstName ||
-                currentUser?.lastName ||
-                isAuthLoading
+                  currentUser?.lastName ||
+                  isAuthLoading
               "
               role="listitem"
               direction="horizontal"
@@ -147,7 +147,7 @@ const formattedDate = computed(() => {
             <nord-stack
               v-if="
                 currentUser?.subscribeToUpdates !== undefined ||
-                isAuthLoading
+                  isAuthLoading
               "
               role="listitem"
               direction="horizontal"

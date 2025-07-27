@@ -1,12 +1,17 @@
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { z } from 'zod';
-import { PASSWORD_RULES } from '~/features/signup/constants/password_strength';
-import { SEMANTIC_CSS_VARIABLES, SEMANTIC_TEXT_COLORS } from '~/shared/constants/semantic_colors';
+import { computed } from "vue";
+import { PASSWORD_RULES } from "~/features/signup/constants/password_strength";
+import { SEMANTIC_CSS_VARIABLES, SEMANTIC_TEXT_COLORS } from "~/shared/constants/semantic_colors";
+import type { z } from "zod";
 
+/**
+ * Props for the NordPasswordStrengthProgressBar component
+ */
 interface Props {
+  /** The password string to validate and show strength for */
   password: string | undefined;
+  /** Zod validation schema for password requirements */
   validationSchema: z.ZodString;
 }
 const props = defineProps<Props>();
@@ -36,7 +41,7 @@ const currentProgressBarStyle = computed(() => {
   
   let color;
   if (strength === 0) {
-    color = 'var(--n-color-status-neutral)';
+    color = "var(--n-color-status-neutral)";
   } else if (strength <= 40) {
     color = SEMANTIC_CSS_VARIABLES.status.danger;
   } else if (strength <= 60) {
@@ -48,7 +53,7 @@ const currentProgressBarStyle = computed(() => {
   }
 
   return {
-    '--n-color-accent': color,
+    "--n-color-accent": color,
   };
 });
 
@@ -56,15 +61,15 @@ const strengthLabelAndColor = computed(() => {
   const strength = currentPasswordStrength.value;
   
   if (strength === 0) {
-    return { label: 'Enter password', color: 'n-color-status-weaker' };
+    return { label: "Enter password", color: "n-color-status-weaker" };
   } else if (strength <= 40) {
-    return { label: 'Very weak', color: SEMANTIC_TEXT_COLORS.danger };
+    return { label: "Very weak", color: SEMANTIC_TEXT_COLORS.danger };
   } else if (strength <= 60) {
-    return { label: 'Weak', color: SEMANTIC_TEXT_COLORS.warning };
+    return { label: "Weak", color: SEMANTIC_TEXT_COLORS.warning };
   } else if (strength <= 80) {
-    return { label: 'Good', color: SEMANTIC_TEXT_COLORS.info };
+    return { label: "Good", color: SEMANTIC_TEXT_COLORS.info };
   } else {
-    return { label: 'Strong', color: SEMANTIC_TEXT_COLORS.success };
+    return { label: "Strong", color: SEMANTIC_TEXT_COLORS.success };
   }
 });
 
@@ -81,7 +86,7 @@ const passwordRuleStatus = computed(() => {
   }
 
   const { success, error } = validationResult.value;
-  const errorMessages = error?.issues?.map(issue => issue.message) || [];
+  const errorMessages = error?.issues?.map(issue => issue.message) ?? [];
 
   return PASSWORD_RULES.map(rule => ({
     ...rule,
@@ -91,7 +96,9 @@ const passwordRuleStatus = computed(() => {
 });
 </script>
 <template>
+  <!-- Password strength indicator -->
   <nord-stack gap="s" role="group" aria-labelledby="strength-label">
+    <!-- Screen reader label -->
     <div id="strength-label" class="visually-hidden-screen-reader">Password strength indicator</div>
     
     <!-- Progress Bar -->
@@ -118,14 +125,18 @@ const passwordRuleStatus = computed(() => {
       </p>
     </nord-stack>
     
-    <!-- Password Requirements -->
+    <!-- Password Requirements List -->
     <template v-if="password && currentPasswordStrength < 100">
       <nord-stack gap="xs" role="group" aria-labelledby="requirements-label">
+        <!-- Requirements header -->
         <p id="requirements-label" class="n-typescale-xs n-color-status-weak n-font-weight-heading">
           Password requirements&colon;
         </p>
+        
+        <!-- Individual requirements -->
         <nord-stack gap="xs" role="list" aria-describedby="requirements-label">
           <template v-for="rule in passwordRuleStatus" :key="rule.message">
+            <!-- Single requirement item -->
             <nord-stack 
               direction="horizontal" 
               gap="xs" 
@@ -133,6 +144,7 @@ const passwordRuleStatus = computed(() => {
               role="listitem"
               :aria-label="`Requirement: ${rule.shortMessage}. ${rule.passed ? 'Passed' : 'Not met'}`"
             >
+              <!-- Requirement status icon -->
               <nord-icon
                 :name="rule.passed ? 'interface-checked' : 'interface-close'"
                 size="xs"
@@ -140,6 +152,8 @@ const passwordRuleStatus = computed(() => {
                 :aria-label="rule.passed ? 'Requirement met' : 'Requirement not met'"
                 data-allow-mismatch
               />
+              
+              <!-- Requirement text -->
               <span 
                 class="n-typescale-xs" 
                 :class="rule.passed ? 'n-color-text-success' : 'n-color-text-danger'"

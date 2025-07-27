@@ -94,10 +94,10 @@ const handleSubmit = handleFormSubmit(async (values) => {
     {
       email: values.email,
       password: values.password,
-      subscribeToUpdates: values.subscribeToUpdates || false,
+      subscribeToUpdates: !!values.subscribeToUpdates,
     },
     () =>
-      navigateTo("/profile", {
+      navigateTo("/edit-profile", {
         replace: true,
       })
   );
@@ -262,7 +262,7 @@ const handleEscape = () => {
                           : 'interface-edit-off'
                       "
                       aria-hidden="true"
-                    ></nord-icon>
+                    />
                   </nord-button>
                 </nord-input>
                 <div
