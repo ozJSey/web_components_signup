@@ -1,7 +1,8 @@
-import { mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
-import ThemeToggle from '~/entities/theme/components/ThemeToggle.vue';
+import { mount } from "@vue/test-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ref } from "vue";
+import ThemeToggle from "~/entities/theme/components/ThemeToggle.vue";
+import type { VueWrapper } from "@vue/test-utils";
 
 // Mock the theme store methods
 const mockToggleDark = vi.fn();
@@ -10,19 +11,19 @@ const mockIsDark = ref(false);
 const mockIsHighContrast = ref(false);
 
 // Mock the complete store module
-vi.mock('~/entities/theme/stores/theme.store', () => ({
-  useThemeStore: () => ({
+vi.mock("~/entities/theme/stores/theme.store", () => ({
+  useThemeStore: (): { toggleDark: () => void; toggleContrast: () => void } => ({
     toggleDark: mockToggleDark,
     toggleContrast: mockToggleContrast,
   }),
 }));
 
 // Mock Vue's toRefs function
-vi.mock('vue', async () => {
-  const actual = await vi.importActual('vue');
+vi.mock("vue", async () => {
+  const actual = await vi.importActual("vue");
   return {
     ...actual,
-    toRefs: () => ({
+    toRefs: (): { isDark: Ref<boolean>; isHighContrast: Ref<boolean> } => ({
       isDark: mockIsDark,
       isHighContrast: mockIsHighContrast,
     }),
@@ -30,54 +31,54 @@ vi.mock('vue', async () => {
 });
 
 // Mock Nuxt auto-imports
-vi.stubGlobal('useThemeStore', () => ({
+vi.stubGlobal("useThemeStore", () => ({
   toggleDark: mockToggleDark,
   toggleContrast: mockToggleContrast,
 }));
 
-vi.stubGlobal('toRefs', () => ({ 
+vi.stubGlobal("toRefs", () => ({
   isDark: mockIsDark,
-  isHighContrast: mockIsHighContrast 
+  isHighContrast: mockIsHighContrast,
 }));
 
-describe('ThemeToggle - Toggle Button Implementation', () => {
-  const createWrapper = () => {
+describe("ThemeToggle - Toggle Button Implementation", () => {
+  const createWrapper = (): VueWrapper<InstanceType<typeof ThemeToggle>> => {
     return mount(ThemeToggle, {
       global: {
         stubs: {
-          'nord-icon': {
+          "nord-icon": {
             template: '<i :name="name" />',
-            props: ['name']
+            props: ["name"],
           },
-          'nord-button': {
+          "nord-button": {
             template: '<button :data-testid="getTestId" :aria-pressed="ariaPressed" @click="$emit(\'click\')"><slot /></button>',
-            props: ['variant', 'size', 'aria-pressed', 'aria-label', 'role', 'data-allow-mismatch'],
+            props: ["variant", "size", "aria-pressed", "aria-label", "role", "data-allow-mismatch"],
             computed: {
-              getTestId() {
+              getTestId(): string {
                 // Since both light/dark buttons have similar aria-labels, use icon name instead
-                const iconSlot = this.$slots.default && this.$slots.default()[0];
-                if (iconSlot && iconSlot.props && iconSlot.props.name) {
+                const iconSlot = this.$slots.default?.()[0];
+                if (iconSlot?.props?.name) {
                   const iconName = iconSlot.props.name;
-                  if (iconName === 'interface-mode-light') return 'light-button';
-                  if (iconName === 'interface-mode-dark') return 'dark-button';
-                  if (iconName === 'interface-partially-complete-small') return 'contrast-button';
+                  if (iconName === "interface-mode-light") {return "light-button";}
+                  if (iconName === "interface-mode-dark") {return "dark-button";}
+                  if (iconName === "interface-partially-complete-small") {return "contrast-button";}
                 }
-                
+
                 // Fallback: check aria-label for contrast
-                const label = this['aria-label'] || '';
-                if (label.includes('contrast')) return 'contrast-button';
-                
-                return 'theme-button';
+                const label = this["aria-label"] ?? "";
+                if (label.includes("contrast")) {return "contrast-button";}
+
+                return "theme-button";
               },
-              ariaPressed() {
-                return this['aria-pressed'];
-              }
-            }
+              ariaPressed(): string {
+                return this["aria-pressed"];
+              },
+            },
           },
-          'nord-button-group': {
-            template: '<div><slot /></div>',
-            props: ['direction', 'gap', 'align-items', 'variant', 'aria-labelledby']
-          }
+          "nord-button-group": {
+            template: "<div><slot /></div>",
+            props: ["direction", "gap", "align-items", "variant", "aria-labelledby"],
+          },
         },
       },
     });
@@ -90,12 +91,12 @@ describe('ThemeToggle - Toggle Button Implementation', () => {
     mockIsHighContrast.value = false;
   });
 
-  describe('👀 Component Structure', () => {
-    it('should render three toggle buttons', () => {
+  describe("👀 Component Structure", () => {
+    it("should render three toggle buttons", () => {
       const wrapper = createWrapper();
 
       const lightButton = wrapper.find('[data-testid="light-button"]');
-      const darkButton = wrapper.find('[data-testid="dark-button"]'); 
+      const darkButton = wrapper.find('[data-testid="dark-button"]');
       const contrastButton = wrapper.find('[data-testid="contrast-button"]');
 
       expect(lightButton.exists()).toBe(true);
@@ -103,7 +104,7 @@ describe('ThemeToggle - Toggle Button Implementation', () => {
       expect(contrastButton.exists()).toBe(true);
     });
 
-    it('should show correct initial state (light mode, no contrast)', () => {
+    it("should show correct initial state (light mode, no contrast)", () => {
       const wrapper = createWrapper();
 
       const lightButton = wrapper.find('[data-testid="light-button"]');
@@ -111,53 +112,53 @@ describe('ThemeToggle - Toggle Button Implementation', () => {
       const contrastButton = wrapper.find('[data-testid="contrast-button"]');
 
       // Light should be pressed, others not
-      expect(lightButton.attributes('aria-pressed')).toBe('true');
-      expect(darkButton.attributes('aria-pressed')).toBe('false');
-      expect(contrastButton.attributes('aria-pressed')).toBe('false');
+      expect(lightButton.attributes("aria-pressed")).toBe("true");
+      expect(darkButton.attributes("aria-pressed")).toBe("false");
+      expect(contrastButton.attributes("aria-pressed")).toBe("false");
     });
   });
 
-  describe('🖱️ User Interactions', () => {
-    it('should toggle to dark mode when dark button clicked', async () => {
+  describe("🖱️ User Interactions", () => {
+    it("should toggle to dark mode when dark button clicked", async () => {
       mockToggleDark.mockClear(); // Clear before this test
       const wrapper = createWrapper();
 
       const darkButton = wrapper.find('[data-testid="dark-button"]');
-      await darkButton.trigger('click');
+      await darkButton.trigger("click");
 
       expect(mockToggleDark).toHaveBeenCalledWith(true);
       // Note: Function may be called multiple times due to component behavior
       expect(mockToggleDark).toHaveBeenCalled();
     });
 
-    it('should toggle to light mode when light button clicked', async () => {
+    it("should toggle to light mode when light button clicked", async () => {
       mockToggleDark.mockClear(); // Clear before this test
       // Start in dark mode
       mockIsDark.value = true;
       const wrapper = createWrapper();
 
       const lightButton = wrapper.find('[data-testid="light-button"]');
-      await lightButton.trigger('click');
+      await lightButton.trigger("click");
 
       expect(mockToggleDark).toHaveBeenCalledWith(false);
       // Note: Function may be called multiple times due to component behavior
       expect(mockToggleDark).toHaveBeenCalled();
     });
 
-    it('should toggle contrast when contrast button clicked', async () => {
+    it("should toggle contrast when contrast button clicked", async () => {
       mockToggleContrast.mockClear(); // Clear before this test
       const wrapper = createWrapper();
 
       const contrastButton = wrapper.find('[data-testid="contrast-button"]');
-      await contrastButton.trigger('click');
+      await contrastButton.trigger("click");
 
       // Note: Function may be called multiple times due to component behavior
       expect(mockToggleContrast).toHaveBeenCalled();
     });
   });
 
-  describe('🔄 State Updates', () => {
-    it('should update button states when isDark changes', async () => {
+  describe("🔄 State Updates", () => {
+    it("should update button states when isDark changes", async () => {
       const wrapper = createWrapper();
 
       // Change to dark mode
@@ -167,11 +168,11 @@ describe('ThemeToggle - Toggle Button Implementation', () => {
       const lightButton = wrapper.find('[data-testid="light-button"]');
       const darkButton = wrapper.find('[data-testid="dark-button"]');
 
-      expect(lightButton.attributes('aria-pressed')).toBe('false');
-      expect(darkButton.attributes('aria-pressed')).toBe('true');
+      expect(lightButton.attributes("aria-pressed")).toBe("false");
+      expect(darkButton.attributes("aria-pressed")).toBe("true");
     });
 
-    it('should update contrast button state when isHighContrast changes', async () => {
+    it("should update contrast button state when isHighContrast changes", async () => {
       const wrapper = createWrapper();
 
       // Enable high contrast
@@ -179,32 +180,32 @@ describe('ThemeToggle - Toggle Button Implementation', () => {
       await wrapper.vm.$nextTick();
 
       const contrastButton = wrapper.find('[data-testid="contrast-button"]');
-      expect(contrastButton.attributes('aria-pressed')).toBe('true');
+      expect(contrastButton.attributes("aria-pressed")).toBe("true");
     });
   });
 
-  describe('♿ Accessibility', () => {
-    it('should have proper ARIA attributes', () => {
+  describe("♿ Accessibility", () => {
+    it("should have proper ARIA attributes", () => {
       const wrapper = createWrapper();
 
       const buttons = wrapper.findAll('[data-testid$="-button"]');
-      
+
       // All buttons should have aria-pressed
       buttons.forEach(button => {
-        expect(button.attributes('aria-pressed')).toBeDefined();
+        expect(button.attributes("aria-pressed")).toBeDefined();
       });
     });
 
-    it('should have semantic group structure', () => {
+    it("should have semantic group structure", () => {
       const wrapper = createWrapper();
 
       // Should be wrapped in a button group
-      expect(wrapper.find('div').exists()).toBe(true);
+      expect(wrapper.find("div").exists()).toBe(true);
     });
   });
 
-  describe('🎯 Theme Combinations', () => {
-    it('should support all theme combinations', () => {
+  describe("🎯 Theme Combinations", () => {
+    it("should support all theme combinations", () => {
       // This test verifies the component can represent all 4 theme states
       // through combinations of the two toggles
 

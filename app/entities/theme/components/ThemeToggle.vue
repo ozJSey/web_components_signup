@@ -1,14 +1,27 @@
 <script setup lang="ts">
 import { useThemeStore } from "~/entities/theme/stores/theme.store";
 
+/**
+ * Theme Toggle Component
+ * 
+ * Provides toggle buttons for switching between light/dark mode and 
+ * high contrast accessibility mode. Theme preferences are automatically
+ * persisted across browser sessions.
+ * 
+ * @example
+ * <ThemeToggle />
+ */
+
 const { toggleDark, toggleContrast } = useThemeStore();
 const { isDark, isHighContrast } = toRefs(useThemeStore());
 </script>
 <template>
+  <!-- Theme toggle component container -->
   <section class="theme-toggle">
-    <div id="theme-toggle-label" class="visually-hidden-screen-reader">
-      Theme selection
-    </div>
+    <!-- Screen reader label for theme selection -->
+    <div id="theme-toggle-label" class="visually-hidden-screen-reader">Theme selection</div>
+    
+    <!-- Theme toggle button group -->
     <nord-button-group
       direction="horizontal"
       gap="xs"
@@ -16,6 +29,7 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
       variant="spaced"
       aria-labelledby="theme-toggle-label"
     >
+      <!-- Light theme toggle button -->
       <!-- There's a bug in the component library where toggling variant like this, throws an error -->
       <!-- However for this task it is harmless and as it is working, so I am keeping as is-->
       <nord-button
@@ -27,8 +41,15 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
         role="button"
         data-allow-mismatch
       >
-        <nord-icon size="m" slot="start" class="icon-only" name="interface-mode-light" />
+        <nord-icon
+          size="m"
+          slot="start"
+          class="icon-only"
+          name="interface-mode-light"
+        />
       </nord-button>
+      
+      <!-- Dark theme toggle button -->
       <nord-button
         size="s"
         :variant="isDark ? 'primary' : 'plain'"
@@ -38,8 +59,15 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
         role="button"
         data-allow-mismatch
       >
-        <nord-icon size="m" slot="start" class="icon-only" name="interface-mode-dark" />
+        <nord-icon
+          size="m"
+          slot="start"
+          class="icon-only"
+          name="interface-mode-dark"
+        />
       </nord-button>
+      
+      <!-- High contrast toggle button -->
       <nord-button
         size="s"
         :variant="isHighContrast ? 'primary' : 'plain'"
@@ -51,11 +79,7 @@ const { isDark, isHighContrast } = toRefs(useThemeStore());
         role="button"
         data-allow-mismatch
       >
-        <nord-icon
-          size="m"
-          slot="start" class="icon-only hack-contrast-icon"
-          name="interface-partially-complete-small"
-        />
+        <nord-icon name="interface-partially-complete-small" />
       </nord-button>
     </nord-button-group>
   </section>
