@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import { toTypedSchema } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
@@ -91,13 +90,17 @@ const toggleNewsletter = () => {
 };
 
 const handleSubmit = handleFormSubmit(async (values) => {
-  const result = await register({
-    email: values.email,
-    password: values.password,
-    subscribeToUpdates: values.subscribeToUpdates || false,
-  }, () => navigateTo("/profile", {
-      replace: true,
-    }));
+  const result = await register(
+    {
+      email: values.email,
+      password: values.password,
+      subscribeToUpdates: values.subscribeToUpdates || false,
+    },
+    () =>
+      navigateTo("/profile", {
+        replace: true,
+      })
+  );
   if (result.userExists) {
     userExists.value = true;
     knownEmailList.value.push(values.email);
@@ -148,7 +151,11 @@ const handleEscape = () => {
             aria-describedby="signup-description"
             @keydown.escape="handleEscape"
           >
-            <div id="signup-description" class="visually-hidden-screen-reader" tabindex="-1">
+            <div
+              id="signup-description"
+              class="visually-hidden-screen-reader"
+              tabindex="-1"
+            >
               Create a new account by providing your email and password.
               Password must meet security requirements. Use Tab to navigate
               between fields, Enter to submit, and Escape to clear the form.
@@ -175,7 +182,11 @@ const handleEscape = () => {
               >
                 {{ currentEmailError || "" }}
               </div>
-              <div id="email-help" class="visually-hidden-screen-reader" tabindex="-1">
+              <div
+                id="email-help"
+                class="visually-hidden-screen-reader"
+                tabindex="-1"
+              >
                 Enter your email address. This will be used for account sign in
                 and communications.
               </div>
@@ -196,7 +207,12 @@ const handleEscape = () => {
                   User already exists with this email.
                 </p>
                 <NuxtLink
-                  to="/sign-in"
+                  :to="{
+                    path: '/sign-in',
+                    query: {
+                      email: email,
+                    },
+                  }"
                   class="n-color-text-accent n-font-size-s"
                 >
                   Go to sign in instead
@@ -257,7 +273,11 @@ const handleEscape = () => {
                 >
                   {{ currentPasswordError || "" }}
                 </div>
-                <div id="password-help" class="visually-hidden-screen-reader" tabindex="-1">
+                <div
+                  id="password-help"
+                  class="visually-hidden-screen-reader"
+                  tabindex="-1"
+                >
                   Create a strong password. Use the toggle button to show or
                   hide your password.
                 </div>
@@ -312,7 +332,7 @@ const handleEscape = () => {
                   @keydown.space.prevent="handleSubmit"
                   tabindex="0"
                 >
-                  {{ isAuthLoading ? 'Creating account...' : 'Create account' }}
+                  Create account
                 </nord-button>
                 <div
                   id="submit-status"
@@ -338,10 +358,12 @@ const handleEscape = () => {
           direction="horizontal"
           class="n-typescale-xs n-padding-m"
         >
-          <p class="n-color-text-weak n-margin-be-xs">Existing user?</p>
+          <p class="n-color-text-weak n-typescale-s n-margin-be-xs">
+            Existing user?
+          </p>
           <NuxtLink
             to="/sign-in"
-            class="n-color-text-accent"
+            class="n-color-text-accent n-typescale-s"
             aria-label="Navigate to sign in page"
           >
             Sign in instead
