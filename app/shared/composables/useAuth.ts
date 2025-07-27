@@ -24,6 +24,26 @@ export const useAuth = () => {
 
   const AUTH_TOKEN_EXPIRY_MS = MINUTE_IN_MS * 15;
 
+  const logout = async (): Promise<void> => {
+    try {
+      setAuthLoading(true);
+      /* If you want to test sign in instead functionality, you may want to console log below condition, because I mocked just 1 db, if I mocked token DB and user DB, I would be able to find the user in other means of course in day-to-day life this is just a back-end error so won't need to try this hard (: */
+      if (authToken.value) {
+        await mockUserDatabase.delete(authToken.value);
+      }
+      _stopAutoRefresh();
+      clearTokens();
+      setCurrentUser(null);
+      showInfoToast("Signed out successfully");
+     
+      await navigateTo("/sign-in", {
+        replace: true,
+      });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const _refreshAuthToken = async () => {
     if (!currentUser.value?.userId || !refreshToken.value) {
       await logout();
@@ -43,7 +63,7 @@ export const useAuth = () => {
       showErrorToast("Session expired. Please sign in again.", {
         isSticky: true,
       });
-      handleAuthError(error);
+      handleAuthError(error, true);
     } finally {
       setAuthLoading(false);
     }
@@ -55,27 +75,10 @@ export const useAuth = () => {
     { immediate: false }
   );
 
-  const handleAuthError = (error: unknown) => {
+  const handleAuthError = (error: unknown, _logout: boolean) => {
     console.error(error instanceof Error ? error.message : error?.toString());
-    logout();
-  };
-
-  const logout = async (): Promise<void> => {
-    try {
-      setAuthLoading(true);
-      if (authToken.value) {
-        await mockUserDatabase.delete(authToken.value);
-      }
-      _stopAutoRefresh();
-      clearTokens();
-      setCurrentUser(null);
-      showInfoToast("Signed out successfully");
-      // Obviously for demo purposes (as signup was asked in particular), sending to sign in every time is the correct call.
-      await navigateTo(mockUserDatabase.count() ? "/sign-in" : "signup", {
-        replace: true,
-      });
-    } finally {
-      setAuthLoading(false);
+    if (_logout) {
+      logout();
     }
   };
 
@@ -96,7 +99,7 @@ export const useAuth = () => {
 
       return userData;
     } catch (error) {
-      handleAuthError(error);
+      handleAuthError(error, false);
       throw error;
     } finally {
       setAuthLoading(false);
@@ -108,7 +111,7 @@ export const useAuth = () => {
       setAuthLoading(true);
       setCurrentUser(userData);
       const tokens = generateMockTokens();
-
+      // Need to upsert here, but won't mock the back-end fully
       setTokens(tokens.authToken, tokens.refreshToken);
       await mockUserDatabase.set(tokens.authToken, userData);
 
@@ -117,7 +120,7 @@ export const useAuth = () => {
         showSuccessToast("Welcome back!");
       }
     } catch (error) {
-      handleAuthError(error);
+      handleAuthError(error, false);
       throw error;
     } finally {
       setAuthLoading(false);
@@ -126,7 +129,7 @@ export const useAuth = () => {
 
   const initAuth = async () => {
     const currentAuthToken = authToken.value;
-
+    
     if (currentAuthToken) {
       try {
         setAuthLoading(true);
@@ -136,19 +139,20 @@ export const useAuth = () => {
           setCurrentUser(userData);
           _startAutoRefresh();
         } else {
-          clearTokens();
-          setCurrentUser(null);
-          _stopAutoRefresh();
+          throw new Error("User not found");
         }
       } catch (error) {
         showErrorToast("Authentication failed. Please sign in again.");
         clearTokens();
         setCurrentUser(null);
         _stopAutoRefresh();
-        handleAuthError(error);
+        logout();
+        handleAuthError(error, false);
       } finally {
         setAuthLoading(false);
       }
+    } else {
+      navigateTo("/sign-in", { replace: true });
     }
   };
 
@@ -164,7 +168,7 @@ export const useAuth = () => {
       showSuccessToast("Profile updated successfully!");
     } catch (error) {
       showErrorToast("Failed to update profile. Please try again.");
-      handleAuthError(error);
+      handleAuthError(error, true);
     } finally {
       setAuthLoading(false);
     }
@@ -251,7 +255,8 @@ export const useAuth = () => {
         throw new Error("Failed to sign in.");
       }
     } catch (error) {
-      handleAuthError(error);
+      handleAuthError(error, false);
+      showErrorToast("Failed to sign in. Email or password is incorrect.");
       return {
         success: false,
       };
@@ -281,13 +286,14 @@ export const useAuth = () => {
     try {
       const newUser = await _createUser(userData);
       await _signIn(newUser, true);
+
       showSuccessToast("Account created successfully!");
       onSuccess();
       return {
         success: true,
       };
     } catch (error) {
-      handleAuthError(error);
+      handleAuthError(error, false);
       return {
         success: false,
       };
