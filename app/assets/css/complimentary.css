@@ -1,0 +1,51 @@
+.visually-hidden-screen-reader,
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  z-index: -1;
+}
+
+#main-content {
+  width: 100%;
+  outline: none;
+}
+
+/* Page transition */
+.rotate-enter-active,
+.rotate-leave-active {
+  transition: all 0.4s ease-in-out;
+}
+
+.rotate-enter-from,
+.rotate-leave-to {
+  opacity: 0;
+  transform: rotate(0.5deg) translateX(20px);
+  filter: blur(5px);
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .rotate-enter-active,
+  .rotate-leave-active,
+  .page-enter-active,
+  .page-leave-active {
+    transition: none;
+  }
+  
+  .rotate-enter-from,
+  .rotate-leave-to,
+  .page-enter-from,
+  .page-leave-to {
+    transform: none;
+  }
+}
