@@ -166,7 +166,7 @@ watchImmediate(query, (value) => {
                     slot="start"
                     class="icon-only"
                     aria-hidden="true"
-                  ></nord-icon>
+                  />
                 </nord-button>
               </nord-input>
               <div

@@ -14,7 +14,25 @@ import { useSpamControl } from "~/shared/composables/useSpamControl";
 import { MINUTE_IN_MS } from "~/shared/constants/time";
 import { hashPassword, verifyPassword } from "~/shared/utils/crypto";
 
-export const useAuth = () => {
+interface UseAuthReturn {
+  authenticate: (email: string, password: string, onSuccess: () => void) => Promise<{ success: boolean; user?: StoredUser }>;
+  register: (userData: { email: string; password: string; subscribeToUpdates?: boolean }, onSuccess: () => void) => Promise<{ success: boolean; userExists?: boolean }>;
+  logout: () => Promise<void>;
+  initAuth: () => Promise<void>;
+  updateUser: (updatedUserData: StoredUser, onSuccess: () => void) => Promise<void>;
+  handleAuthError: (error: unknown, _alsoLogout: boolean) => void;
+}
+/**
+ * Authentication Composable
+ *
+ * Provides authentication functionality including login, registration,
+ * logout, and session management. Handles token refresh and user state.
+ *
+ * @returns Authentication methods and utilities
+ * @example
+ * const { authenticate, register, logout, initAuth } = useAuth();
+ */
+export const useAuth = (): UseAuthReturn => {
   const { currentUser, authToken, refreshToken } = toRefs(useAuthStore());
   const { setCurrentUser, setTokens, clearTokens, setAuthLoading } =
     useAuthStore();
@@ -43,17 +61,21 @@ export const useAuth = () => {
       setAuthLoading(false);
     }
   };
-
-  const _refreshAuthToken = async () => {
+  /*
+   * Internal function to refresh authentication token
+   * Handles token expiration and renewal using refresh token
+   * @private
+   */
+  const _refreshAuthToken = async (): Promise<void> => {
     if (!currentUser.value?.userId || !refreshToken.value) {
-      await logout();
+      logout();
       return;
     }
 
     try {
       setAuthLoading(true);
       const authTokenResponse = await generateMockAuthToken(
-        currentUser.value?.userId
+        currentUser.value?.userId,
       );
 
       if (authTokenResponse) {
@@ -70,20 +92,22 @@ export const useAuth = () => {
   };
 
   const { pause: _stopAutoRefresh, resume: _startAutoRefresh } = useIntervalFn(
-    _refreshAuthToken,
+    () => {
+      _refreshAuthToken();
+    },
     AUTH_TOKEN_EXPIRY_MS,
-    { immediate: false }
+    { immediate: false },
   );
 
-  const handleAuthError = (error: unknown, _logout: boolean) => {
+  const handleAuthError = (error: unknown, _alsoLogout: boolean) => {
     console.error(error instanceof Error ? error.message : error?.toString());
-    if (_logout) {
+    if (_alsoLogout) {
       logout();
     }
   };
 
   const _createUser = async (
-    userFormData: SetUserInput
+    userFormData: SetUserInput,
   ): Promise<StoredUser> => {
     try {
       setAuthLoading(true);
@@ -106,7 +130,7 @@ export const useAuth = () => {
     }
   };
 
-  const _signIn = async (userData: StoredUser, fromSignup: boolean = false) => {
+  const _signIn = async (userData: StoredUser, fromSignup = false): Promise<void> => {
     try {
       setAuthLoading(true);
       setCurrentUser(userData);
@@ -127,9 +151,9 @@ export const useAuth = () => {
     }
   };
 
-  const initAuth = async () => {
+  const initAuth = async (): Promise<void> => {
     const currentAuthToken = authToken.value;
-    
+
     if (currentAuthToken) {
       try {
         setAuthLoading(true);
@@ -156,7 +180,7 @@ export const useAuth = () => {
     }
   };
 
-  const updateUser = async (updatedUserData: StoredUser, onSuccess: () => void) => {
+  const updateUser = async (updatedUserData: StoredUser, onSuccess: () => void): Promise<void> => {
     try {
       setAuthLoading(true);
       setCurrentUser(updatedUserData);
@@ -174,20 +198,20 @@ export const useAuth = () => {
     }
   };
 
-  const getExistingEmails = () => {
+  const getExistingEmails = (): string[] => {
     const allUsers = Object.keys(localStorage)
       .filter((key) => key.startsWith("mock-user-database"))
       .map((key) => {
         try {
-          const data = JSON.parse(localStorage.getItem(key) || "{}");
+          const data = JSON.parse(localStorage.getItem(key) ?? "{}");
           return Object.values(data);
         } catch {
           return [];
         }
       })
-      .flat();
+      .flat() as StoredUser[];
 
-    return allUsers.map((user: any) => user.email).filter(Boolean);
+    return allUsers.map((user) => user.email).filter(Boolean);
   };
 
   const confirmedExistingEmails = computed(() => getExistingEmails());
@@ -197,13 +221,13 @@ export const useAuth = () => {
         .filter((key) => key.startsWith("mock-user-database"))
         .map((key) => {
           try {
-            const data = JSON.parse(localStorage.getItem(key) || "{}");
+            const data = JSON.parse(localStorage.getItem(key) ?? "{}");
             return Object.values(data);
           } catch {
             return [];
           }
         })
-        .flat() as StoredUser[]
+        .flat() as StoredUser[],
   );
 
   const checkUserExists = (email: string): boolean => {
@@ -215,7 +239,7 @@ export const useAuth = () => {
     return allUsers.find((u) => u.email === email) ?? null;
   };
 
-  const verifyUserCredentials = async (email: string, password: string) => {
+  const verifyUserCredentials = async (email: string, password: string): Promise<StoredUser | null> => {
     const user = findUserByEmail(email);
 
     if (!user) {
@@ -226,13 +250,13 @@ export const useAuth = () => {
     return passwordVerified ? user : null;
   };
 
-  const handleUserExistsError = () => {
+  const handleUserExistsError = (): void => {
     showErrorToast(
-      "User already exists with this email. Please sign in instead."
+      "User already exists with this email. Please sign in instead.",
     );
   };
 
-  const authenticate = async (email: string, password: string, onSuccess: () => void) => {
+  const authenticate = async (email: string, password: string, onSuccess: () => void): Promise<{ success: boolean; user?: StoredUser }> => {
     const isSpam = handleSpamCheck(email);
     if (isSpam) {
       return {
@@ -242,7 +266,7 @@ export const useAuth = () => {
 
     try {
       const user = await verifyUserCredentials(email, password);
-      
+
       if (user) {
         await _signIn(user);
         showSuccessToast("Sign in successful!");
@@ -267,7 +291,7 @@ export const useAuth = () => {
     email: string;
     password: string;
     subscribeToUpdates?: boolean;
-  }, onSuccess: () => void) => {
+  }, onSuccess: () => void): Promise<{ success: boolean; userExists?: boolean }> => {
     const isSpam = handleSpamCheck(userData.email);
     if (isSpam) {
       return {
@@ -301,11 +325,17 @@ export const useAuth = () => {
   };
 
   return {
+    /** Authenticate user with email and password */
     authenticate,
+    /** Register new user account */
     register,
+    /** Sign out current user and clear session */
     logout,
+    /** Initialize authentication system on app startup */
     initAuth,
+    /** Update current user profile information */
     updateUser,
+    /** Handle authentication errors with user feedback */
     handleAuthError,
   };
 };
