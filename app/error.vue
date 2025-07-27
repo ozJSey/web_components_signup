@@ -56,11 +56,11 @@ const goBack = () => {
 
       <nord-stack justify-content="center" gap="l" direction="horizontal" class="n-padding-xl">
         <nord-button variant="plain" @click="goBack">
-          <nord-icon name="arrow-left" size="s" class="n-margin-ie-s"/>
+          <nord-icon slot="start" name="arrow-left" size="s" class="n-margin-ie-s"/>
           Go Back
         </nord-button>
         <nord-button variant="primary" @click="goHome">
-          <nord-icon name="interface-home" size="s" class="n-margin-ie-s" />
+          <nord-icon slot="start" name="interface-home" size="s" class="n-margin-ie-s" />
           Go to home
         </nord-button>
       </nord-stack>
