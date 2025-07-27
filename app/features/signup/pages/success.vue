@@ -46,7 +46,7 @@ const formattedDate = computed(() => {
             data-allow-mismatch
             effect="sheen"
             v-if="isAuthLoading"
-            style="height: 48px; width: 48px"
+            :style="{ height: '48px', width: '48px' }"
           />
           <nord-avatar
             v-else-if="currentUser?.firstName || currentUser?.lastName"
@@ -62,7 +62,7 @@ const formattedDate = computed(() => {
           <nord-stack gap="s" align-items="center">
             <nord-skeleton
               data-allow-mismatch
-              style="height: 32px; width: 200px"
+              :style="{ height: '32px', width: '200px' }"
               effect="sheen"
               v-if="isAuthLoading"
             />
@@ -75,7 +75,7 @@ const formattedDate = computed(() => {
             </h1>
             <nord-skeleton
               data-allow-mismatch
-              style="height: 21px; width: 300px"
+              :style="{ height: '21px', width: '300px' }"
               effect="sheen"
               v-if="isAuthLoading"
             />
@@ -103,7 +103,7 @@ const formattedDate = computed(() => {
               <strong>Email:</strong>
               <nord-skeleton
                 data-allow-mismatch
-                style="height: 21px; width: 180px"
+                :style="{ height: '21px', width: '180px' }"
                 effect="sheen"
                 v-if="isAuthLoading"
               />
@@ -124,7 +124,7 @@ const formattedDate = computed(() => {
               <strong>Name:</strong>
               <nord-skeleton
                 data-allow-mismatch
-                style="height: 21px; width: 120px"
+                :style="{ height: '21px', width: '120px' }"
                 effect="sheen"
                 v-if="isAuthLoading"
               />
@@ -136,7 +136,7 @@ const formattedDate = computed(() => {
               <strong>Member since:</strong>
               <nord-skeleton
                 data-allow-mismatch
-                style="height: 21px; width: 140px"
+                :style="{ height: '21px', width: '140px' }"
                 v-if="isAuthLoading"
                 effect="sheen"
               />
@@ -157,7 +157,7 @@ const formattedDate = computed(() => {
               <nord-skeleton
                 data-allow-mismatch
                 effect="sheen"
-                style="height: 21px; width: 100px"
+                :style="{ height: '21px', width: '100px' }"
                 v-if="isAuthLoading"
               />
               <span v-else class="n-truncate">
@@ -178,7 +178,7 @@ const formattedDate = computed(() => {
           :loading="isAuthLoading"
           data-allow-mismatch
         >
-          Sign Out
+          Sign out
         </nord-button>
       </nord-stack>
     </nord-card>
