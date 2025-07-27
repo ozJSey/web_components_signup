@@ -45,10 +45,6 @@ export const useAuth = (): UseAuthReturn => {
   const logout = async (): Promise<void> => {
     try {
       setAuthLoading(true);
-      /* If you want to test sign in instead functionality, you may want to console log below condition, because I mocked just 1 db, if I mocked token DB and user DB, I would be able to find the user in other means of course in day-to-day life this is just a back-end error so won't need to try this hard (: */
-      if (authToken.value) {
-        await mockUserDatabase.delete(authToken.value);
-      }
       _stopAutoRefresh();
       clearTokens();
       setCurrentUser(null);
@@ -74,10 +70,22 @@ export const useAuth = (): UseAuthReturn => {
 
     try {
       setAuthLoading(true);
+      const expiringAuthToken = authToken.value;
+      let userData: StoredUser | null = null;
+      if (expiringAuthToken) {
+        const currentUser = await mockGetUserByToken(currentAuthToken);
+        userData = currentUser;
+      }
       const authTokenResponse = await generateMockAuthToken(
         currentUser.value?.userId,
       );
 
+      if (userData) {
+        if (expiringAuthToken) {
+          await mockUserDatabase.delete(expiringAuthToken);
+        }
+        await mockUserDatabase.set(authTokenResponse, userData);
+      }
       if (authTokenResponse) {
         setTokens(authTokenResponse, refreshToken.value);
       }
@@ -95,7 +103,7 @@ export const useAuth = (): UseAuthReturn => {
     () => {
       _refreshAuthToken();
     },
-    AUTH_TOKEN_EXPIRY_MS,
+    AUTH_TOKEN_EXPIRY_MS / 0.95, // Some time to do some back-end to refresh db entry.
     { immediate: false },
   );
 
