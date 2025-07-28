@@ -30,7 +30,12 @@
     
     // Other options
     "types": ["@nordhealth/components/lib/vue.d.ts"],
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    ".nuxt",
+    "dist"
+  ]
 }

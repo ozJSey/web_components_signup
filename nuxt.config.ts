@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   plugins: ["~/plugins/nordhealth-components.ts"],
   vue: {
     compilerOptions: {
-      isCustomElement: (tag) => tag.startsWith("nord-"),
+      isCustomElement: (tag: string) => tag.startsWith("nord-"),
     },
   },
   ssr: false,
