@@ -1,7 +1,8 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ref } from "vue";
-import ThemeToggle from "~/entities/theme/components/ThemeToggle.vue";
+// eslint-disable-next-line no-restricted-imports
+import ThemeToggle from "./ThemeToggle.vue";
 import type { VueWrapper } from "@vue/test-utils";
 
 // Mock the theme store methods

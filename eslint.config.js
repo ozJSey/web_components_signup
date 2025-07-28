@@ -12,6 +12,8 @@ export default [
       '.output/**/*', 
       'node_modules/**/*',
       'dist/**/*',
+      'app/**/*.spec.ts',
+      'app/**/*.test.ts',
     ],
   },
   // Base configuration for TypeScript and JavaScript files

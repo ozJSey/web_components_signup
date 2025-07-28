@@ -1,7 +1,8 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import NordPasswordStrengthProgressBar from "~/features/signup/components/NordPasswordStrengthProgressBar.vue";
+// eslint-disable-next-line no-restricted-imports
+import NordPasswordStrengthProgressBar from "./NordPasswordStrengthProgressBar.vue";
 import type { VueWrapper } from "@vue/test-utils";
 
 // Mock constants - what users see, not how it's calculated

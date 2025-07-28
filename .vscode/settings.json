@@ -2,7 +2,7 @@
   // Auto-fix and format on save
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
-    "source.organizeImports": "explicit",
+    "source.organizeImports": "never",
     "source.sortMembers": "explicit"
   },
   "editor.formatOnSave": true,

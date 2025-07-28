@@ -8,11 +8,11 @@ import {
   mockGetUserByToken,
 } from "~/entities/auth/services/mock-auth";
 import { useAuthStore } from "~/entities/auth/stores/auth.store";
-import type { SetUserInput, StoredUser } from "~/entities/auth/types";
 import { useAppToast } from "~/shared/composables/useAppToast";
 import { useSpamControl } from "~/shared/composables/useSpamControl";
 import { MINUTE_IN_MS } from "~/shared/constants/time";
 import { hashPassword, verifyPassword } from "~/shared/utils/crypto";
+import type { SetUserInput, StoredUser } from "~/entities/auth/types";
 
 interface UseAuthReturn {
   authenticate: (email: string, password: string, onSuccess: () => void) => Promise<{ success: boolean; user?: StoredUser }>;

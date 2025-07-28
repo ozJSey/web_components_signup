@@ -34,8 +34,11 @@
     "forceConsistentCasingInFileNames": true
   },
   "exclude": [
+    // First 3 is actually in nuxt tsconfig but just in case.
     "node_modules",
     ".nuxt",
-    "dist"
+    "dist",
+    "app/**/*.spec.ts",
+    "app/**/*.test.ts"
   ]
 }
