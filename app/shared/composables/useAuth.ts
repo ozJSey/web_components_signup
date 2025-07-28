@@ -49,7 +49,7 @@ export const useAuth = (): UseAuthReturn => {
       clearTokens();
       setCurrentUser(null);
       showInfoToast("Signed out successfully");
-     
+
       await navigateTo("/sign-in", {
         replace: true,
       });
@@ -73,7 +73,7 @@ export const useAuth = (): UseAuthReturn => {
       const expiringAuthToken = authToken.value;
       let userData: StoredUser | null = null;
       if (expiringAuthToken) {
-        const currentUser = await mockGetUserByToken(currentAuthToken);
+        const currentUser = await mockGetUserByToken(expiringAuthToken);
         userData = currentUser;
       }
       const authTokenResponse = await generateMockAuthToken(
@@ -107,7 +107,7 @@ export const useAuth = (): UseAuthReturn => {
     { immediate: false },
   );
 
-  const handleAuthError = (error: unknown, _alsoLogout: boolean) => {
+  const handleAuthError = (error: unknown, _alsoLogout: boolean): void => {
     console.error(error instanceof Error ? error.message : error?.toString());
     if (_alsoLogout) {
       logout();
