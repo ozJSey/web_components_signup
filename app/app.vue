@@ -30,7 +30,7 @@ const { initAuth } = useAuth();
 
 const toastGroupRef = useTemplateRef<ToastGroupElement>("toastGroupRef");
 const { initToast } = useAppToast();
-watchOnce(
+watchImmediate(
   () => toastGroupRef.value,
   (value) => {
     if (value) {
