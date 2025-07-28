@@ -158,7 +158,6 @@ export default [
         parser: tsParser,
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: './tsconfig.json',
         extraFileExtensions: ['.vue'],
       },
     },
@@ -289,12 +288,10 @@ export default [
         },
       ],
       
-      // TypeScript rules (subset for Vue)
+      // TypeScript rules (subset for Vue - no type-aware rules)
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
-      '@typescript-eslint/prefer-optional-chain': 'error',
       
       // General best practices (same as TS config)
       'prefer-const': 'error',

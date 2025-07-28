@@ -1,11 +1,9 @@
 <template>
-  <ErrorBoundary>
-    <NuxtLayout>
-      <NuxtPage />
-      <ThemeToggle class="theme-toggle" />
-      <nord-toast-group ref="toastGroupRef" />
-    </NuxtLayout>
-  </ErrorBoundary>
+  <NuxtLayout>
+    <NuxtPage />
+    <ThemeToggle class="theme-toggle" />
+    <nord-toast-group ref="toastGroupRef" />
+  </NuxtLayout>
 </template>
 
 <script setup lang="ts">
