@@ -34,18 +34,15 @@ const handleEmailInput = (event: Event) => {
   userExists.value = knownEmailList.value.includes(email.value);
 };
 
-const getGeneratedPasswordSchema = (): z.ZodString => {
-  let schema = z.string();
-
-  PASSWORD_RULES.forEach((rule) => {
-    if (!rule.check || !rule.message) {
-      return;
-    } else {
-      schema = schema.refine(rule.check, rule.message);
-    }
-  });
-
-  return schema;
+const getGeneratedPasswordSchema = () => {
+  return PASSWORD_RULES.reduce(
+    (schema: z.ZodTypeAny, rule) => schema.refine(rule.check, rule.message),
+    z
+      .string()
+      .max(VISIBLE_CHARACTER_LIMIT_WITHOUT_TRUNCATION_NEED * 2, {
+        message: "Password cannot be longer than 40 characters",
+      })
+  );
 };
 
 const passwordSchema = getGeneratedPasswordSchema();
@@ -55,10 +52,7 @@ const formSchema = z.object({
     .string()
     .max(MAXIMUM_EMAIL_LENGTH, "Email must be less than 320 characters")
     .email("Please enter a valid email address"),
-  password: passwordSchema.max(
-    VISIBLE_CHARACTER_LIMIT_WITHOUT_TRUNCATION_NEED,
-    "Password must be less than 40 characters"
-  ),
+  password: passwordSchema,
   subscribeToUpdates: z.boolean().optional(),
 });
 

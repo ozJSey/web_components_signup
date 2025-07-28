@@ -1,12 +1,15 @@
 <template>
   <NuxtLayout>
-    <NuxtPage />
+    <ErrorBoundary>
+      <NuxtPage />
+    </ErrorBoundary>
     <ThemeToggle class="theme-toggle" />
     <nord-toast-group ref="toastGroupRef" />
   </NuxtLayout>
 </template>
 
 <script setup lang="ts">
+import ErrorBoundary from "~/entities/error_handler/ErrorBoundary.vue";
 import ThemeToggle from "~/entities/theme/components/ThemeToggle.vue";
 import { useThemeStore } from "~/entities/theme/stores/theme.store";
 import { useAppToast } from "~/shared/composables/useAppToast";
